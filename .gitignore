@@ -1,0 +1,15 @@
+# Dependency Directories
+/node_modules
+
+# Environment Variables (CRITICAL)
+.env
+
+# Build Artifacts (if any)
+/dist
+/build
+
+# IDE and OS Files
+.vscode
+.DS_Store
+*.log
+npm-debug.log*

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community - Green Coins Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'green-primary': '#10B981',
+                        'green-secondary': '#059669',
+                        'green-light': '#D1FAE5',
+                        'blue-primary': '#3B82F6',
+                        'purple-primary': '#8B5CF6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-lg z-50 border-b border-gray-200/50">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center animate-spin-slow">
+                        <i class="fas fa-recycle text-white text-lg"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-800">Green Coins</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Home</a>
+                    <a href="rewards.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Rewards</a>
+                    <a href="scanner.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">AI Scanner</a>
+                    <a href="kiosks.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Find Kiosks</a>
+                    <a href="community.html" class="text-green-primary font-semibold border-b-2 border-green-primary">Community</a>
+                    <a href="leaderboard.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Leaderboard</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-light px-4 py-2 rounded-full text-sm font-medium text-green-secondary animate-glow">
+                        <i class="fas fa-coins mr-2"></i>
+                        <span id="nav-coins">1,245</span> Coins
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-20 pb-8 bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 relative overflow-hidden">
+        <div id="community-particles" class="absolute inset-0"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl lg:text-6xl font-bold text-gray-800 mb-4">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600">Eco-Warrior</span> Community
+                </h1>
+                <p class="text-xl text-gray-600 mb-6">Connect with thousands of eco-warriors making a difference</p>
+                
+                <div class="flex justify-center mb-8">
+                    <div id="community-hero-3d" class="w-64 h-64">
+                        <!-- 3D community animation -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Stats -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl hover-lift">
+                    <div class="text-3xl font-bold text-green-primary mb-2">10,247</div>
+                    <div class="text-gray-600 text-sm">Active Members</div>
+                </div>
+                <div class="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl hover-lift">
+                    <div class="text-3xl font-bold text-blue-primary mb-2">2,156</div>
+                    <div class="text-gray-600 text-sm">Posts Today</div>
+                </div>
+                <div class="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl hover-lift">
+                    <div class="text-3xl font-bold text-purple-primary mb-2">8,942</div>
+                    <div class="text-gray-600 text-sm">Devices Shared</div>
+                </div>
+                <div class="p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl hover-lift">
+                    <div class="text-3xl font-bold text-orange-500 mb-2">425</div>
+                    <div class="text-gray-600 text-sm">Cities Connected</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Create Post Section -->
+    <section class="py-8 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white rounded-2xl p-6 shadow-lg">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-pen text-green-500 mr-3"></i>
+                        Share Your Green Journey
+                    </h2>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-primary to-blue-primary rounded-full flex items-center justify-center text-white font-bold">
+                            YOU
+                        </div>
+                        <div class="flex-1">
+                            <textarea 
+                                class="w-full p-4 border border-gray-200 rounded-lg resize-none focus:border-green-500 focus:outline-none" 
+                                rows="3" 
+                                placeholder="What's your environmental impact story today?"
+                                id="post-textarea"
+                            ></textarea>
+                            
+                            <div class="flex items-center justify-between mt-4">
+                                <div class="flex items-center space-x-4">
+                                    <button class="text-gray-500 hover:text-blue-500 transition-colors" title="Add Photo">
+                                        <i class="fas fa-camera text-xl"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-green-500 transition-colors" title="Add Location">
+                                        <i class="fas fa-map-marker-alt text-xl"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-purple-500 transition-colors" title="Add Emoji">
+                                        <i class="fas fa-smile text-xl"></i>
+                                    </button>
+                                </div>
+                                <button class="bg-gradient-to-r from-green-primary to-blue-primary text-white px-6 py-2 rounded-full hover:shadow-lg transform hover:-translate-y-1 transition-all" id="post-btn">
+                                    Share Post
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Feed -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-stream text-blue-500 mr-3"></i>
+                    Community Feed
+                </h2>
+                
+                <div class="space-y-6" id="community-feed">
+                    <!-- Post 1 -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg border hover-lift">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-primary to-blue-primary rounded-full flex items-center justify-center text-white font-bold mr-4">AC</div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <span class="font-semibold text-gray-800 mr-2">Alex Chen</span>
+                                        <span class="text-sm text-gray-500 mr-2">Level 12</span>
+                                        <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">Eco Champion</span>
+                                    </div>
+                                    <span class="text-sm text-gray-500">2 min ago</span>
+                                </div>
+                                <p class="text-gray-700 mb-4">Just recycled my old iPhone 11 and earned 150 Green Coins! 📱♻️ Every small action counts towards a greener future. Who's joining the Earth Day challenge?</p>
+                                
+                                <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-mobile-alt text-blue-500 mr-2"></i>
+                                        <span class="font-medium">iPhone 11 • +150 coins • 0.8kg CO₂ saved</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-6">
+                                        <button class="flex items-center text-gray-500 hover:text-red-500 transition-colors">
+                                            <i class="fas fa-heart mr-1"></i>
+                                            <span>42</span>
+                                        </button>
+                                        <button class="flex items-center text-gray-500 hover:text-blue-500 transition-colors">
+                                            <i class="fas fa-comment mr-1"></i>
+                                            <span>8</span>
+                                        </button>
+                                        <button class="flex items-center text-gray-500 hover:text-green-500 transition-colors">
+                                            <i class="fas fa-share mr-1"></i>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
+                                    <button class="text-green-500 hover:text-green-600 transition-colors">
+                                        Follow Challenge
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post 2 -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg border hover-lift">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-primary to-pink-500 rounded-full flex items-center justify-center text-white font-bold mr-4">SK</div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <span class="font-semibold text-gray-800 mr-2">Sarah Kim</span>
+                                        <span class="text-sm text-gray-500 mr-2">Level 8</span>
+                                        <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">Planet Saver</span>
+                                    </div>
+                                    <span class="text-sm text-gray-500">1 hour ago</span>
+                                </div>
+                                <p class="text-gray-700 mb-4">Reached 1000 Green Coins milestone! 🎉 Just redeemed Netflix Premium and still have coins left for metro cards. This platform is amazing! #GreenCoins #Sustainability</p>
+                                
+                                <div class="grid grid-cols-2 gap-3 mb-4">
+                                    <div class="bg-red-50 rounded-lg p-3 text-center">
+                                        <i class="fas fa-tv text-red-500 text-xl mb-1"></i>
+                                        <div class="text-sm font-medium">Netflix Premium</div>
+                                        <div class="text-xs text-gray-600">-500 coins</div>
+                                    </div>
+                                    <div class="bg-green-50 rounded-lg p-3 text-center">
+                                        <i class="fas fa-coins text-green-500 text-xl mb-1"></i>
+                                        <div class="text-sm font-medium">500 Coins Left</div>
+                                        <div class="text-xs text-gray-600">Available</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-6">
+                                        <button class="flex items-center text-gray-500 hover:text-red-500 transition-colors">
+                                            <i class="fas fa-heart mr-1"></i>
+                                            <span>67</span>
+                                        </button>
+                                        <button class="flex items-center text-gray-500 hover:text-blue-500 transition-colors">
+                                            <i class="fas fa-comment mr-1"></i>
+                                            <span>15</span>
+                                        </button>
+                                        <button class="flex items-center text-gray-500 hover:text-green-500 transition-colors">
+                                            <i class="fas fa-share mr-1"></i>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post 3 -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg border hover-lift">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold mr-4">RP</div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <span class="font-semibold text-gray-800 mr-2">Raj Patel</span>
+                                        <span class="text-sm text-gray-500 mr-2">Level 15</span>
+                                        <span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full">Green Warrior</span>
+                                    </div>
+                                    <span class="text-sm text-gray-500">3 hours ago</span>
+                                </div>
+                                <p class="text-gray-700 mb-4">Team recycling day at our office! 💼 Collected 25 old devices and earned 2000+ coins together. Building a sustainable workplace culture one device at a time.</p>
+                                
+                                <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 mb-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-green-600">25</div>
+                                            <div class="text-xs text-gray-600">Devices</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-blue-600">2,145</div>
+                                            <div class="text-xs text-gray-600">Coins Earned</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-purple-600">18.5</div>
+                                            <div class="text-xs text-gray-600">kg CO₂ Saved</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-6">
+                                        <button class="flex items-center text-gray-500 hover:text-red-500 transition-colors">
+                                            <i class="fas fa-heart mr-1"></i>
+                                            <span>89</span>
+                                        </button>
+                                        <button class="flex items-center text-gray-500 hover:text-blue-500 transition-colors">
+                                            <i class="fas fa-comment mr-1"></i>
+                                            <span>23</span>
+                                        </button>
+                                        <button class="flex items-center text-gray-500 hover:text-green-500 transition-colors">
+                                            <i class="fas fa-share mr-1"></i>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
+                                    <button class="text-purple-500 hover:text-purple-600 transition-colors">
+                                        Join Team Event
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <button class="bg-gradient-to-r from-green-primary to-blue-primary text-white px-8 py-3 rounded-full hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                        Load More Posts
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center mr-2">
+                    <i class="fas fa-recycle text-white text-sm"></i>
+                </div>
+                <span class="text-xl font-bold">Green Coins</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">Connect with eco-warriors worldwide</p>
+            <p class="text-gray-400 text-xs">&copy; 2024 Green Coins. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/community-animations.js"></script>
+</body>
+</html>

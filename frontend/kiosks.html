@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Kiosks - Green Coins Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'green-primary': '#10B981',
+                        'green-secondary': '#059669',
+                        'green-light': '#D1FAE5',
+                        'blue-primary': '#3B82F6',
+                        'purple-primary': '#8B5CF6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-lg z-50 border-b border-gray-200/50">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center animate-spin-slow">
+                        <i class="fas fa-recycle text-white text-lg"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-800">Green Coins</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Home</a>
+                    <a href="rewards.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Rewards</a>
+                    <a href="scanner.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">AI Scanner</a>
+                    <a href="kiosks.html" class="text-green-primary font-semibold border-b-2 border-green-primary">Find Kiosks</a>
+                    <a href="community.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Community</a>
+                    <a href="leaderboard.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Leaderboard</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-light px-4 py-2 rounded-full text-sm font-medium text-green-secondary animate-glow">
+                        <i class="fas fa-coins mr-2"></i>
+                        <span id="nav-coins">1,245</span> Coins
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-20 pb-8 bg-gradient-to-br from-indigo-50 via-blue-50 to-cyan-50 relative overflow-hidden">
+        <div id="kiosks-particles" class="absolute inset-0"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl lg:text-6xl font-bold text-gray-800 mb-4">
+                    Find <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600">Smart Kiosks</span> Near You
+                </h1>
+                <p class="text-xl text-gray-600 mb-6">Locate recycling kiosks and check real-time availability</p>
+                
+                <div class="flex justify-center mb-8">
+                    <div id="kiosks-hero-3d" class="w-80 h-80">
+                        <!-- 3D kiosk network animation -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search and Filter -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-4 mb-8">
+                    <div class="flex-1 relative">
+                        <input type="text" placeholder="Search by location, area, or kiosk name..." 
+                               class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <button class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-8 py-3 rounded-lg hover:shadow-lg transition-all">
+                        <i class="fas fa-crosshairs mr-2"></i>
+                        Use My Location
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap gap-3 mb-8">
+                    <button class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+                        <i class="fas fa-circle text-green-500 mr-2"></i>Available
+                    </button>
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+                        All Status
+                    </button>
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-clock mr-2"></i>24/7
+                    </button>
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-star mr-2"></i>Top Rated
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map and Kiosks -->
+    <section class="py-8 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Map Area -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-map text-blue-500 mr-3"></i>
+                        Interactive Map
+                    </h2>
+                    
+                    <div class="bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl h-96 flex items-center justify-center relative overflow-hidden">
+                        <div id="map-3d-container" class="absolute inset-0"></div>
+                        <div class="relative z-10 text-center">
+                            <i class="fas fa-map-marker-alt text-6xl text-blue-400 mb-4"></i>
+                            <p class="text-blue-600 font-medium">Interactive 3D Map</p>
+                            <p class="text-blue-500 text-sm">Real-time kiosk locations</p>
+                        </div>
+                    </div>
+
+                    <!-- Map Controls -->
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="flex space-x-2">
+                            <button class="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-search-plus text-gray-600"></i>
+                            </button>
+                            <button class="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-search-minus text-gray-600"></i>
+                            </button>
+                            <button class="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-expand text-gray-600"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-4 text-sm">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                                <span>Available</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
+                                <span>Busy</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                                <span>Offline</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Kiosk List -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-list text-green-500 mr-3"></i>
+                        Nearby Kiosks
+                    </h2>
+                    
+                    <!-- Kiosk 1 -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover-lift cursor-pointer">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-green-500 rounded-full mr-3 animate-pulse"></div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Green Kiosk - Tech Park</h3>
+                                    <p class="text-gray-600 text-sm">Sector 62, Noida</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-green-500 font-semibold">0.8 km</div>
+                                <div class="text-sm text-green-600">Available</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-4 mb-4 text-center text-sm">
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">45/200</div>
+                                <div class="text-gray-600">Capacity</div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">23</div>
+                                <div class="text-gray-600">Today</div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">4.8★</div>
+                                <div class="text-gray-600">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">
+                                <i class="fas fa-clock mr-1"></i>
+                                Open 24/7
+                            </span>
+                            <button class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:shadow-lg transition-all">
+                                Get Directions
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kiosk 2 -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover-lift cursor-pointer">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-orange-500 rounded-full mr-3 animate-pulse"></div>
+                                <div>
+                                    <h3 class="font-bold text-lg">EcoPoint - Mall Road</h3>
+                                    <p class="text-gray-600 text-sm">Connaught Place, Delhi</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-orange-500 font-semibold">1.2 km</div>
+                                <div class="text-sm text-orange-600">Busy</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-4 mb-4 text-center text-sm">
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">156/180</div>
+                                <div class="text-gray-600">Capacity</div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">34</div>
+                                <div class="text-gray-600">Today</div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">4.6★</div>
+                                <div class="text-gray-600">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">
+                                <i class="fas fa-clock mr-1"></i>
+                                9 AM - 9 PM
+                            </span>
+                            <button class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-lg text-sm hover:shadow-lg transition-all">
+                                Get Directions
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kiosk 3 -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover-lift cursor-pointer opacity-75">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-red-500 rounded-full mr-3"></div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Green Station - Metro</h3>
+                                    <p class="text-gray-600 text-sm">Rajiv Chowk Metro Station</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-red-500 font-semibold">2.1 km</div>
+                                <div class="text-sm text-red-600">Offline</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-4 mb-4 text-center text-sm">
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">89/150</div>
+                                <div class="text-gray-600">Capacity</div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">12</div>
+                                <div class="text-gray-600">Today</div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">4.5★</div>
+                                <div class="text-gray-600">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">
+                                <i class="fas fa-tools mr-1"></i>
+                                Under Maintenance
+                            </span>
+                            <button class="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm cursor-not-allowed">
+                                Offline
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kiosk 4 -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover-lift cursor-pointer">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-green-500 rounded-full mr-3 animate-pulse"></div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Recycle Hub - University</h3>
+                                    <p class="text-gray-600 text-sm">DU North Campus</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-green-500 font-semibold">3.5 km</div>
+                                <div class="text-sm text-green-600">Available</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-4 mb-4 text-center text-sm">
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">78/220</div>
+                                <div class="text-gray-600">Capacity</div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">18</div>
+                                <div class="text-gray-600">Today</div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <div class="font-semibold">4.9★</div>
+                                <div class="text-gray-600">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">
+                                <i class="fas fa-clock mr-1"></i>
+                                6 AM - 11 PM
+                            </span>
+                            <button class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:shadow-lg transition-all">
+                                Get Directions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Network Stats -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold text-center mb-8">Live Network Statistics</h2>
+                
+                <div class="bg-gradient-to-r from-green-primary to-blue-primary rounded-2xl p-8 text-white">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                        <div>
+                            <div id="network-3d-1" class="w-16 h-16 mx-auto mb-4"></div>
+                            <div class="text-3xl font-bold mb-2" id="active-kiosks-stat">12/15</div>
+                            <div class="opacity-75">Active Kiosks</div>
+                        </div>
+                        <div>
+                            <div id="network-3d-2" class="w-16 h-16 mx-auto mb-4"></div>
+                            <div class="text-3xl font-bold mb-2" id="today-recycling-stat">1,247</div>
+                            <div class="opacity-75">Devices Today</div>
+                        </div>
+                        <div>
+                            <div id="network-3d-3" class="w-16 h-16 mx-auto mb-4"></div>
+                            <div class="text-3xl font-bold mb-2" id="coins-distributed-stat">45,890</div>
+                            <div class="opacity-75">Coins Distributed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center mr-2">
+                    <i class="fas fa-recycle text-white text-sm"></i>
+                </div>
+                <span class="text-xl font-bold">Green Coins</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">Find recycling kiosks near you</p>
+            <p class="text-gray-400 text-xs">&copy; 2024 Green Coins. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/kiosks-animations.js"></script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Scanner - Green Coins Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'green-primary': '#10B981',
+                        'green-secondary': '#059669',
+                        'green-light': '#D1FAE5',
+                        'blue-primary': '#3B82F6',
+                        'purple-primary': '#8B5CF6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-lg z-50 border-b border-gray-200/50">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center animate-spin-slow">
+                        <i class="fas fa-recycle text-white text-lg"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-800">Green Coins</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Home</a>
+                    <a href="rewards.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Rewards</a>
+                    <a href="scanner.html" class="text-green-primary font-semibold border-b-2 border-green-primary">AI Scanner</a>
+                    <a href="kiosks.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Find Kiosks</a>
+                    <a href="community.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Community</a>
+                    <a href="leaderboard.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Leaderboard</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-light px-4 py-2 rounded-full text-sm font-medium text-green-secondary animate-glow">
+                        <i class="fas fa-coins mr-2"></i>
+                        <span id="nav-coins">1,245</span> Coins
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-20 pb-8 bg-gradient-to-br from-blue-50 via-cyan-50 to-green-50 relative overflow-hidden">
+        <div id="scanner-particles" class="absolute inset-0"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl lg:text-6xl font-bold text-gray-800 mb-4">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">AI-Powered</span> Device Scanner
+                </h1>
+                <p class="text-xl text-gray-600 mb-6">Upload a photo and let our AI instantly evaluate your device's value</p>
+                
+                <div class="flex justify-center mb-8">
+                    <div id="scanner-hero-3d" class="w-80 h-80">
+                        <!-- 3D scanning animation -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Scanner Interface -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Scanner Interface -->
+                    <div class="bg-gray-50 rounded-2xl p-8">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                            <i class="fas fa-camera text-blue-500 mr-3"></i>
+                            Device Scanner
+                        </h2>
+                        
+                        <!-- Upload Area -->
+                        <div id="upload-area" class="border-3 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-500 transition-all duration-300 bg-white mb-6">
+                            <div id="upload-content">
+                                <div id="upload-3d-icon" class="w-24 h-24 mx-auto mb-4"></div>
+                                <p class="text-gray-600 mb-2 text-lg">Click to upload device photo</p>
+                                <p class="text-sm text-gray-500">Supports JPG, PNG up to 10MB</p>
+                            </div>
+                            <input type="file" id="device-upload" class="hidden" accept="image/*">
+                        </div>
+                        
+                        <!-- Quick Scan Options -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                            <button class="quick-scan-btn p-4 bg-white rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-all text-center" data-device="phone">
+                                <i class="fas fa-mobile-alt text-2xl text-gray-600 mb-2"></i>
+                                <div class="text-sm font-medium">Phone</div>
+                            </button>
+                            <button class="quick-scan-btn p-4 bg-white rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-all text-center" data-device="laptop">
+                                <i class="fas fa-laptop text-2xl text-gray-600 mb-2"></i>
+                                <div class="text-sm font-medium">Laptop</div>
+                            </button>
+                            <button class="quick-scan-btn p-4 bg-white rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-all text-center" data-device="tablet">
+                                <i class="fas fa-tablet-alt text-2xl text-gray-600 mb-2"></i>
+                                <div class="text-sm font-medium">Tablet</div>
+                            </button>
+                            <button class="quick-scan-btn p-4 bg-white rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-all text-center" data-device="charger">
+                                <i class="fas fa-plug text-2xl text-gray-600 mb-2"></i>
+                                <div class="text-sm font-medium">Charger</div>
+                            </button>
+                        </div>
+
+                        <!-- Scanning Progress -->
+                        <div id="scanning-progress" class="hidden mb-6">
+                            <div class="bg-blue-50 rounded-xl p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="animate-spin mr-3">
+                                        <i class="fas fa-cog text-blue-500 text-xl"></i>
+                                    </div>
+                                    <span class="font-semibold text-gray-800">AI Analysis in Progress...</span>
+                                </div>
+                                <div class="w-full bg-blue-200 rounded-full h-3 mb-4">
+                                    <div class="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full progress-bar" style="width: 0%"></div>
+                                </div>
+                                <div class="text-sm text-gray-600" id="scan-status">Initializing AI models...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Analysis Results -->
+                    <div class="bg-gray-50 rounded-2xl p-8">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                            <i class="fas fa-brain text-purple-500 mr-3"></i>
+                            AI Analysis Results
+                        </h2>
+                        
+                        <div id="no-results" class="text-center py-12">
+                            <div id="waiting-3d" class="w-32 h-32 mx-auto mb-4"></div>
+                            <p class="text-gray-500 text-lg">Upload a device to see AI analysis</p>
+                        </div>
+
+                        <!-- Results Display -->
+                        <div id="analysis-results" class="hidden">
+                            <div class="bg-white rounded-xl p-6 mb-6">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <div id="result-device-3d" class="w-16 h-16 mr-4"></div>
+                                        <div>
+                                            <h3 class="font-bold text-lg text-gray-800" id="device-name">iPhone 12 Pro</h3>
+                                            <p class="text-gray-600 text-sm" id="device-condition">Excellent Condition</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-3xl font-bold text-green-500" id="device-coins">180</div>
+                                        <div class="text-sm text-gray-500">Green Coins</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div class="bg-gray-50 p-3 rounded-lg">
+                                        <div class="text-sm text-gray-600">Brand</div>
+                                        <div class="font-semibold" id="device-brand">Apple</div>
+                                    </div>
+                                    <div class="bg-gray-50 p-3 rounded-lg">
+                                        <div class="text-sm text-gray-600">Category</div>
+                                        <div class="font-semibold" id="device-category">Smartphone</div>
+                                    </div>
+                                    <div class="bg-gray-50 p-3 rounded-lg">
+                                        <div class="text-sm text-gray-600">CO₂ Impact</div>
+                                        <div class="font-semibold text-green-600" id="co2-impact">0.8 kg saved</div>
+                                    </div>
+                                    <div class="bg-gray-50 p-3 rounded-lg">
+                                        <div class="text-sm text-gray-600">AI Confidence</div>
+                                        <div class="font-semibold text-blue-600" id="ai-confidence">95%</div>
+                                    </div>
+                                </div>
+
+                                <button class="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-1 transition-all" id="proceed-recycle">
+                                    Proceed to Recycle
+                                </button>
+                            </div>
+
+                            <!-- Environmental Impact -->
+                            <div class="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-6">
+                                <h4 class="font-bold text-lg mb-4 flex items-center">
+                                    <i class="fas fa-leaf text-green-500 mr-2"></i>
+                                    Environmental Impact
+                                </h4>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Carbon Footprint Reduced:</span>
+                                        <span class="font-semibold text-green-600" id="carbon-reduced">0.8 kg CO₂</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Materials Recovered:</span>
+                                        <span class="font-semibold text-blue-600" id="materials-recovered">85%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Energy Saved:</span>
+                                        <span class="font-semibold text-purple-600" id="energy-saved">2.4 kWh</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Capabilities Section -->
+    <section class="py-8 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Advanced AI Capabilities</h2>
+                <p class="text-gray-600">Our cutting-edge AI technology ensures accurate device recognition and valuation</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Smart Recognition -->
+                <div class="bg-white rounded-xl p-6 text-center hover-lift">
+                    <div id="ai-feature-1" class="w-16 h-16 mx-auto mb-4"></div>
+                    <h3 class="font-bold text-lg mb-3">Smart Device Recognition</h3>
+                    <p class="text-gray-600 text-sm">Advanced computer vision identifies device type, brand, and model with 95%+ accuracy</p>
+                </div>
+
+                <!-- Condition Assessment -->
+                <div class="bg-white rounded-xl p-6 text-center hover-lift">
+                    <div id="ai-feature-2" class="w-16 h-16 mx-auto mb-4"></div>
+                    <h3 class="font-bold text-lg mb-3">Condition Assessment</h3>
+                    <p class="text-gray-600 text-sm">AI analyzes visual damage, wear patterns, and functional status automatically</p>
+                </div>
+
+                <!-- Value Calculation -->
+                <div class="bg-white rounded-xl p-6 text-center hover-lift">
+                    <div id="ai-feature-3" class="w-16 h-16 mx-auto mb-4"></div>
+                    <h3 class="font-bold text-lg mb-3">Dynamic Valuation</h3>
+                    <p class="text-gray-600 text-sm">Real-time market data integration for fair and accurate coin valuations</p>
+                </div>
+
+                <!-- Environmental Impact -->
+                <div class="bg-white rounded-xl p-6 text-center hover-lift">
+                    <div id="ai-feature-4" class="w-16 h-16 mx-auto mb-4"></div>
+                    <h3 class="font-bold text-lg mb-3">Impact Calculation</h3>
+                    <p class="text-gray-600 text-sm">Precise environmental impact calculations including CO₂ savings and material recovery</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Scans -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-history text-gray-500 mr-3"></i>
+                    Recent AI Scans
+                </h2>
+                
+                <div class="space-y-4" id="recent-scans">
+                    <!-- Scan History Items -->
+                    <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-between hover-lift">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-mobile-alt text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-800">iPhone 13 Pro Max</div>
+                                <div class="text-sm text-gray-600">Scanned 2 minutes ago • Excellent condition</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-green-600">+200 coins</div>
+                            <div class="text-sm text-gray-500">AI: 98% confident</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-between hover-lift">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-laptop text-purple-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-800">MacBook Air M1</div>
+                                <div class="text-sm text-gray-600">Scanned 1 hour ago • Good condition</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-green-600">+350 coins</div>
+                            <div class="text-sm text-gray-500">AI: 92% confident</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-between hover-lift">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-tablet-alt text-green-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-800">iPad Pro 11"</div>
+                                <div class="text-sm text-gray-600">Scanned 3 hours ago • Fair condition</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-green-600">+180 coins</div>
+                            <div class="text-sm text-gray-500">AI: 89% confident</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tips Section -->
+    <section class="py-8 bg-gradient-to-br from-blue-50 to-green-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">💡 Pro Tips for Best AI Recognition</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl p-6">
+                        <h3 class="font-bold text-lg mb-4 flex items-center">
+                            <i class="fas fa-camera text-blue-500 mr-2"></i>
+                            Photography Tips
+                        </h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="text-green-500 mr-2">•</span>Take photos in good lighting conditions</li>
+                            <li class="flex items-start"><span class="text-green-500 mr-2">•</span>Include the entire device in frame</li>
+                            <li class="flex items-start"><span class="text-green-500 mr-2">•</span>Avoid shadows and reflections</li>
+                            <li class="flex items-start"><span class="text-green-500 mr-2">•</span>Show device from multiple angles if possible</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-6">
+                        <h3 class="font-bold text-lg mb-4 flex items-center">
+                            <i class="fas fa-tag text-purple-500 mr-2"></i>
+                            Naming Convention
+                        </h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="text-purple-500 mr-2">•</span>Smartphones: "phone.jpg", "iphone.png"</li>
+                            <li class="flex items-start"><span class="text-purple-500 mr-2">•</span>Laptops: "laptop.jpg", "macbook.png"</li>
+                            <li class="flex items-start"><span class="text-purple-500 mr-2">•</span>Tablets: "tablet.jpg", "ipad.png"</li>
+                            <li class="flex items-start"><span class="text-purple-500 mr-2">•</span>Accessories: "charger.jpg", "headphones.png"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Help Button -->
+    <div class="fixed bottom-6 left-6 z-40">
+        <button class="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all" id="help-btn">
+            <i class="fas fa-question text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center mr-2">
+                    <i class="fas fa-recycle text-white text-sm"></i>
+                </div>
+                <span class="text-xl font-bold">Green Coins</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">AI-powered device scanning for environmental impact</p>
+            <p class="text-gray-400 text-xs">&copy; 2024 Green Coins. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/scanner-animations.js"></script>
+</body>
+</html>

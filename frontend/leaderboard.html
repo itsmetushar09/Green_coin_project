@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - Green Coins Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'green-primary': '#10B981',
+                        'green-secondary': '#059669',
+                        'green-light': '#D1FAE5',
+                        'blue-primary': '#3B82F6',
+                        'purple-primary': '#8B5CF6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-lg z-50 border-b border-gray-200/50">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center animate-spin-slow">
+                        <i class="fas fa-recycle text-white text-lg"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-800">Green Coins</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Home</a>
+                    <a href="rewards.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Rewards</a>
+                    <a href="scanner.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">AI Scanner</a>
+                    <a href="kiosks.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Find Kiosks</a>
+                    <a href="community.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Community</a>
+                    <a href="leaderboard.html" class="text-green-primary font-semibold border-b-2 border-green-primary">Leaderboard</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-light px-4 py-2 rounded-full text-sm font-medium text-green-secondary animate-glow">
+                        <i class="fas fa-coins mr-2"></i>
+                        <span id="nav-coins">1,245</span> Coins
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-20 pb-8 bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 relative overflow-hidden">
+        <div id="leaderboard-particles" class="absolute inset-0"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl lg:text-6xl font-bold text-gray-800 mb-4">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-600">Global</span> Leaderboard
+                </h1>
+                <p class="text-xl text-gray-600 mb-6">Compete with eco-warriors worldwide and climb the ranks</p>
+                
+                <div class="flex justify-center mb-8">
+                    <div id="leaderboard-hero-3d" class="w-64 h-64">
+                        <!-- 3D trophy animation -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard Categories -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-center mb-8">
+                <div class="flex flex-wrap gap-4 bg-gray-100 p-2 rounded-xl">
+                    <button class="leaderboard-tab active px-6 py-3 rounded-lg font-medium transition-all" data-tab="coins">Green Coins</button>
+                    <button class="leaderboard-tab px-6 py-3 rounded-lg font-medium transition-all" data-tab="devices">Devices Recycled</button>
+                    <button class="leaderboard-tab px-6 py-3 rounded-lg font-medium transition-all" data-tab="co2">CO₂ Saved</button>
+                    <button class="leaderboard-tab px-6 py-3 rounded-lg font-medium transition-all" data-tab="weekly">Weekly</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top 3 Podium -->
+    <section class="py-8 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">Hall of Champions</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- 2nd Place -->
+                    <div class="order-2 md:order-1">
+                        <div class="bg-white rounded-2xl p-6 text-center hover-lift">
+                            <div id="second-place-3d" class="w-20 h-20 mx-auto mb-4"></div>
+                            <div class="text-6xl mb-4">🥈</div>
+                            <div class="w-16 h-16 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">SK</div>
+                            <h3 class="font-bold text-lg">Sarah Kim</h3>
+                            <div class="text-sm text-gray-600 mb-2">Level 8 • Seoul, KR</div>
+                            <div class="text-2xl font-bold text-gray-600 mb-2">2,650</div>
+                            <div class="text-sm text-gray-500">Green Coins</div>
+                            <div class="flex justify-center space-x-1 mt-3">
+                                <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">Planet Saver</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1st Place -->
+                    <div class="order-1 md:order-2">
+                        <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 text-center hover-lift border-2 border-yellow-200 relative">
+                            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                                <div class="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-bold">
+                                    👑 CHAMPION
+                                </div>
+                            </div>
+                            <div id="first-place-3d" class="w-24 h-24 mx-auto mb-4"></div>
+                            <div class="text-8xl mb-4">🏆</div>
+                            <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">AC</div>
+                            <h3 class="font-bold text-xl">Alex Chen</h3>
+                            <div class="text-sm text-gray-600 mb-2">Level 12 • Delhi, IN</div>
+                            <div class="text-3xl font-bold text-yellow-600 mb-2">2,840</div>
+                            <div class="text-sm text-gray-500">Green Coins</div>
+                            <div class="flex justify-center space-x-1 mt-3">
+                                <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">Eco Champion</span>
+                                <span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full">Monthly King</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3rd Place -->
+                    <div class="order-3">
+                        <div class="bg-white rounded-2xl p-6 text-center hover-lift">
+                            <div id="third-place-3d" class="w-20 h-20 mx-auto mb-4"></div>
+                            <div class="text-6xl mb-4">🥉</div>
+                            <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">MR</div>
+                            <h3 class="font-bold text-lg">Mike Rodriguez</h3>
+                            <div class="text-sm text-gray-600 mb-2">Level 10 • Barcelona, ES</div>
+                            <div class="text-2xl font-bold text-orange-600 mb-2">2,180</div>
+                            <div class="text-sm text-gray-500">Green Coins</div>
+                            <div class="flex justify-center space-x-1 mt-3">
+                                <span class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full">Green Warrior</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Full Leaderboard -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-green-primary to-blue-primary p-6 text-white">
+                        <h2 class="text-2xl font-bold flex items-center">
+                            <i class="fas fa-trophy mr-3"></i>
+                            Global Rankings
+                        </h2>
+                        <p class="opacity-90 mt-2">Top eco-warriors making a difference worldwide</p>
+                    </div>
+                    
+                    <div class="p-6">
+                        <!-- Your Rank Card -->
+                        <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-6 border-2 border-blue-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4">YOU</div>
+                                    <div>
+                                        <h4 class="font-bold text-lg">Your Current Rank</h4>
+                                        <div class="text-sm text-gray-600">Keep recycling to climb higher!</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-3xl font-bold text-blue-600">#127</div>
+                                    <div class="text-sm text-gray-600">1,245 coins</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rankings List -->
+                        <div class="space-y-3" id="leaderboard-list">
+                            <!-- Rank 4 -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover-lift">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 flex items-center justify-center font-bold text-xl text-gray-600 mr-4">4</div>
+                                    <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold mr-4">DL</div>
+                                    <div>
+                                        <h4 class="font-semibold">David Liu</h4>
+                                        <div class="text-sm text-gray-600">Level 9 • Tokyo, JP</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-lg">1,950</div>
+                                    <div class="text-sm text-gray-600">coins</div>
+                                </div>
+                            </div>
+
+                            <!-- Rank 5 -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover-lift">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 flex items-center justify-center font-bold text-xl text-gray-600 mr-4">5</div>
+                                    <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold mr-4">EW</div>
+                                    <div>
+                                        <h4 class="font-semibold">Emma Wilson</h4>
+                                        <div class="text-sm text-gray-600">Level 7 • London, UK</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-lg">1,820</div>
+                                    <div class="text-sm text-gray-600">coins</div>
+                                </div>
+                            </div>
+
+                            <!-- Rank 6 -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover-lift">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 flex items-center justify-center font-bold text-xl text-gray-600 mr-4">6</div>
+                                    <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-orange-400 rounded-full flex items-center justify-center text-white font-bold mr-4">JS</div>
+                                    <div>
+                                        <h4 class="font-semibold">John Smith</h4>
+                                        <div class="text-sm text-gray-600">Level 8 • New York, US</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-lg">1,745</div>
+                                    <div class="text-sm text-gray-600">coins</div>
+                                </div>
+                            </div>
+
+                            <!-- Rank 7 -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover-lift">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 flex items-center justify-center font-bold text-xl text-gray-600 mr-4">7</div>
+                                    <div class="w-10 h-10 bg-gradient-to-br from-teal-400 to-cyan-400 rounded-full flex items-center justify-center text-white font-bold mr-4">MJ</div>
+                                    <div>
+                                        <h4 class="font-semibold">Maria Johnson</h4>
+                                        <div class="text-sm text-gray-600">Level 6 • São Paulo, BR</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-lg">1,680</div>
+                                    <div class="text-sm text-gray-600">coins</div>
+                                </div>
+                            </div>
+
+                            <!-- Rank 8 -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover-lift">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 flex items-center justify-center font-bold text-xl text-gray-600 mr-4">8</div>
+                                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold mr-4">AP</div>
+                                    <div>
+                                        <h4 class="font-semibold">Ahmed Patel</h4>
+                                        <div class="text-sm text-gray-600">Level 7 • Mumbai, IN</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-lg">1,560</div>
+                                    <div class="text-sm text-gray-600">coins</div>
+                                </div>
+                            </div>
+
+                            <!-- Rank 9 -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover-lift">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 flex items-center justify-center font-bold text-xl text-gray-600 mr-4">9</div>
+                                    <div class="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full flex items-center justify-center text-white font-bold mr-4">LB</div>
+                                    <div>
+                                        <h4 class="font-semibold">Lisa Brown</h4>
+                                        <div class="text-sm text-gray-600">Level 6 • Sydney, AU</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-lg">1,420</div>
+                                    <div class="text-sm text-gray-600">coins</div>
+                                </div>
+                            </div>
+
+                            <!-- Rank 10 -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover-lift">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 flex items-center justify-center font-bold text-xl text-gray-600 mr-4">10</div>
+                                    <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-400 rounded-full flex items-center justify-center text-white font-bold mr-4">KW</div>
+                                    <div>
+                                        <h4 class="font-semibold">Kevin Wang</h4>
+                                        <div class="text-sm text-gray-600">Level 5 • Singapore, SG</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-lg">1,380</div>
+                                    <div class="text-sm text-gray-600">coins</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-8">
+                            <button class="bg-gradient-to-r from-green-primary to-blue-primary text-white px-8 py-3 rounded-full hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                                View Full Rankings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements & Progress -->
+    <section class="py-8 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Monthly Progress -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg">
+                    <h3 class="text-xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-chart-line text-green-500 mr-3"></i>
+                        Your Monthly Progress
+                    </h3>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-600">Progress to next level</span>
+                            <span class="text-sm font-medium">68%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-gradient-to-r from-green-primary to-blue-primary h-3 rounded-full" style="width: 68%"></div>
+                        </div>
+                    </div>
+                    
+                    <canvas id="progress-chart" style="height: 300px;"></canvas>
+                </div>
+                
+                <!-- Recent Achievements -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg">
+                    <h3 class="text-xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-medal text-yellow-500 mr-3"></i>
+                        Recent Achievements
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-leaf text-green-500 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-800">Eco Warrior</h4>
+                                <p class="text-sm text-gray-600">Recycled 10+ devices</p>
+                            </div>
+                            <div class="text-green-500 font-bold">+100</div>
+                        </div>
+                        
+                        <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-globe text-blue-500 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-800">Planet Saver</h4>
+                                <p class="text-sm text-gray-600">Saved 1 ton of CO₂</p>
+                            </div>
+                            <div class="text-blue-500 font-bold">+200</div>
+                        </div>
+                        
+                        <div class="flex items-center p-3 bg-purple-50 rounded-lg opacity-60">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-trophy text-purple-500 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-800">Green Champion</h4>
+                                <p class="text-sm text-gray-600">Rank in top 100</p>
+                            </div>
+                            <div class="text-gray-400">Locked</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center mr-2">
+                    <i class="fas fa-recycle text-white text-sm"></i>
+                </div>
+                <span class="text-xl font-bold">Green Coins</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">Compete and contribute to a sustainable future</p>
+            <p class="text-gray-400 text-xs">&copy; 2024 Green Coins. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/leaderboard-animations.js"></script>
+</body>
+</html>

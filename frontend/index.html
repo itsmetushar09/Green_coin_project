@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Coins - Gamified E-Waste Recycling Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'green-primary': '#10B981',
+                        'green-secondary': '#059669',
+                        'green-light': '#D1FAE5',
+                        'blue-primary': '#3B82F6',
+                        'purple-primary': '#8B5CF6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-lg z-50 border-b border-gray-200/50">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center animate-spin-slow">
+                        <i class="fas fa-recycle text-white text-lg"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-800">Green Coins</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-green-primary font-semibold border-b-2 border-green-primary">Home</a>
+                    <a href="rewards.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Rewards</a>
+                    <a href="scanner.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">AI Scanner</a>
+                    <a href="kiosks.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Find Kiosks</a>
+                    <a href="community.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Community</a>
+                    <a href="leaderboard.html" class="text-gray-600 hover:text-green-primary transition-all duration-300 hover:scale-105">Leaderboard</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-light px-4 py-2 rounded-full text-sm font-medium text-green-secondary animate-glow">
+                        <i class="fas fa-coins mr-2"></i>
+                        <span id="nav-coins"></span> Coins
+                    </div>
+              <div class="flex items-center space-x-3">
+    <div class="bg-green-light px-4 py-2 rounded-full text-sm font-medium text-green-secondary animate-glow">
+        <i class="fas fa-coins mr-2"></i>
+        <span id="nav-coins">---</span> Coins
+    </div>
+    <button id="auth-button" class="bg-gradient-to-r from-green-primary to-green-secondary text-white px-6 py-2 rounded-full hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300">
+        Sign In
+    </button>
+</div>
+
+
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-16 pb-8 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 relative overflow-hidden min-h-screen flex items-center">
+        <div id="hero-particles" class="absolute inset-0"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 animate-fade-in-up">
+                    <h1 class="text-4xl lg:text-6xl font-bold text-gray-800 mb-6 leading-tight">
+                        Turn Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-primary to-blue-primary animate-pulse">E-Waste</span> 
+                        Into Daily <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-primary to-green-primary animate-pulse">Rewards</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        Gamify recycling with Green Coins! Earn digital rewards for every old device you recycle, 
+                        then redeem them for OTT subscriptions, metro cards, EV charging, and more.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="bg-gradient-to-r from-green-primary to-green-secondary text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 animate-bounce-custom">
+                            <i class="fas fa-mobile-alt mr-2"></i>
+                            Start Earning Now
+                        </button>
+                        <a href="scanner.html" class="border-2 border-green-primary text-green-primary px-8 py-4 rounded-full font-semibold text-lg hover:bg-green-primary hover:text-white transition-all duration-300 text-center">
+                            <i class="fas fa-camera mr-2"></i>
+                            Scan Device
+                        </a>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 flex justify-center">
+                    <div id="hero-3d-container" class="w-96 h-96 relative">
+                        <!-- 3D Three.js animation will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Stats Section -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl hover-lift">
+                    <div class="text-3xl font-bold text-green-primary mb-2" id="active-users">10K+</div>
+                    <div class="text-gray-600 text-sm">Active Users</div>
+                </div>
+                <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl hover-lift">
+                    <div class="text-3xl font-bold text-blue-primary mb-2" id="devices-recycled">50K+</div>
+                    <div class="text-gray-600 text-sm">Devices Recycled</div>
+                </div>
+                <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl hover-lift">
+                    <div class="text-3xl font-bold text-purple-primary mb-2" id="co2-saved">1.2K</div>
+                    <div class="text-gray-600 text-sm">Tons CO₂ Saved</div>
+                </div>
+                <div class="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl hover-lift">
+                    <div class="text-3xl font-bold text-orange-500 mb-2" id="coins-earned">2M+</div>
+                    <div class="text-gray-600 text-sm">Coins Earned</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Your Green Wallet -->
+    <section class="py-8 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Your Green Wallet</h2>
+                <div class="bg-gradient-to-br from-green-primary to-green-secondary rounded-2xl p-6 text-white relative overflow-hidden hover-scale">
+                    <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-lg font-medium opacity-90">Total Balance</h3>
+                                <div class="flex items-center mt-2">
+                                    <span id="wallet-balance" class="text-4xl font-bold cursor-pointer hover:scale-110 transition-transform">1,245</span>
+                                    <span class="text-lg ml-2 opacity-90">Green Coins</span>
+                                    <div class="ml-4 animate-float">
+                                        <i class="fas fa-coins text-2xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="wallet-3d-container" class="w-24 h-24 relative">
+                                <!-- 3D wallet animation -->
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div class="p-3 bg-white/10 rounded-lg">
+                                <div class="text-2xl font-bold" id="earned-today">45</div>
+                                <div class="text-sm opacity-75">Earned Today</div>
+                            </div>
+                            <div class="p-3 bg-white/10 rounded-lg">
+                                <div class="text-2xl font-bold" id="level">12</div>
+                                <div class="text-sm opacity-75">Current Level</div>
+                            </div>
+                            <div class="p-3 bg-white/10 rounded-lg">
+                                <div class="text-2xl font-bold" id="badges">4</div>
+                                <div class="text-sm opacity-75">Badges Earned</div>
+                            </div>
+                            <div class="p-3 bg-white/10 rounded-lg">
+                                <div class="text-2xl font-bold" id="rank">127</div>
+                                <div class="text-sm opacity-75">Global Rank</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">How It Works</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Step 1 -->
+                <div class="text-center p-6 bg-gray-50 rounded-xl hover-lift step-card" data-step="1">
+                    <div id="step1-3d" class="w-20 h-20 mx-auto mb-4"></div>
+                    <div class="bg-green-primary text-white w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-4">1</div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800">Bring E-Waste</h3>
+                    <p class="text-gray-600 text-sm">Drop off old devices at smart kiosks or partner stores</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="text-center p-6 bg-gray-50 rounded-xl hover-lift step-card" data-step="2">
+                    <div id="step2-3d" class="w-20 h-20 mx-auto mb-4"></div>
+                    <div class="bg-blue-primary text-white w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-4">2</div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800">AI Analysis</h3>
+                    <p class="text-gray-600 text-sm">Our AI scans and evaluates your device automatically</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="text-center p-6 bg-gray-50 rounded-xl hover-lift step-card" data-step="3">
+                    <div id="step3-3d" class="w-20 h-20 mx-auto mb-4"></div>
+                    <div class="bg-purple-primary text-white w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-4">3</div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800">Earn Coins</h3>
+                    <p class="text-gray-600 text-sm">Get instant Green Coins based on device value</p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="text-center p-6 bg-gray-50 rounded-xl hover-lift step-card" data-step="4">
+                    <div id="step4-3d" class="w-20 h-20 mx-auto mb-4"></div>
+                    <div class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-4">4</div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800">Redeem Rewards</h3>
+                    <p class="text-gray-600 text-sm">Use coins for subscriptions, transport, and more</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Rewards Preview -->
+    <section class="py-8 bg-gradient-to-br from-green-50 to-blue-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Popular Rewards</h2>
+                <p class="text-gray-600">Turn your coins into valuable rewards</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Netflix -->
+                <div class="bg-white rounded-xl p-6 hover-lift cursor-pointer" onclick="window.location.href='rewards.html'">
+                    <div id="netflix-3d" class="w-16 h-16 mx-auto mb-4"></div>
+                    <h3 class="font-bold text-lg mb-2">Netflix Premium</h3>
+                    <p class="text-gray-600 text-sm mb-4">1 month subscription</p>
+                    <div class="text-green-primary font-bold text-lg">500 Coins</div>
+                </div>
+
+                <!-- Metro Card -->
+                <div class="bg-white rounded-xl p-6 hover-lift cursor-pointer" onclick="window.location.href='rewards.html'">
+                    <div id="metro-3d" class="w-16 h-16 mx-auto mb-4"></div>
+                    <h3 class="font-bold text-lg mb-2">Metro Pass</h3>
+                    <p class="text-gray-600 text-sm mb-4">Weekly travel pass</p>
+                    <div class="text-blue-primary font-bold text-lg">300 Coins</div>
+                </div>
+
+                <!-- EV Charging -->
+                <div class="bg-white rounded-xl p-6 hover-lift cursor-pointer" onclick="window.location.href='rewards.html'">
+                    <div id="ev-3d" class="w-16 h-16 mx-auto mb-4"></div>
+                    <h3 class="font-bold text-lg mb-2">EV Charging</h3>
+                    <p class="text-gray-600 text-sm mb-4">5 hours of charging</p>
+                    <div class="text-purple-primary font-bold text-lg">400 Coins</div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a href="rewards.html" class="bg-gradient-to-r from-green-primary to-blue-primary text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300">
+                    View All Rewards
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Activity Feed -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Live Community Activity</h2>
+                    <p class="text-gray-600">See what eco-warriors are doing right now</p>
+                </div>
+                
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <div id="activity-feed" class="space-y-4 max-h-80 overflow-y-auto custom-scrollbar">
+                        <!-- Activity items will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="text-center mt-6">
+                    <a href="community.html" class="text-green-primary font-semibold hover:text-green-secondary transition-colors">
+                        Join the Community →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Environmental Impact -->
+    <section class="py-8 bg-gradient-to-br from-gray-900 to-green-900 text-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold mb-4">Environmental Impact</h2>
+                <p class="text-gray-300">Together, we're building a sustainable future</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div class="text-center">
+                    <div id="impact1-3d" class="w-20 h-20 mx-auto mb-4"></div>
+                    <div class="text-4xl font-bold mb-2" id="total-co2">2.5 Tons</div>
+                    <div class="text-gray-300">CO₂ Emissions Saved</div>
+                </div>
+                
+                <div class="text-center">
+                    <div id="impact2-3d" class="w-20 h-20 mx-auto mb-4"></div>
+                    <div class="text-4xl font-bold mb-2" id="total-devices">50,000+</div>
+                    <div class="text-gray-300">Devices Recycled</div>
+                </div>
+                
+                <div class="text-center">
+                    <div id="impact3-3d" class="w-20 h-20 mx-auto mb-4"></div>
+                    <div class="text-4xl font-bold mb-2" id="total-warriors">10,000+</div>
+                    <div class="text-gray-300">Eco-Warriors</div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div class="text-6xl mb-4 animate-float">🌱</div>
+                <h3 class="text-2xl font-bold mb-4">Ready to Make an Impact?</h3>
+                <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
+                    Every device you recycle helps reduce electronic waste and contributes to a cleaner planet.
+                </p>
+                <a href="scanner.html" class="bg-white text-green-900 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+                    Start Recycling Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-8 bg-gradient-to-r from-green-primary to-blue-primary text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-4">Join the Green Revolution</h2>
+            <p class="text-xl mb-6 opacity-90">Start earning rewards for your environmental impact today</p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="bg-white text-green-600 px-8 py-3 rounded-full font-semibold flex items-center justify-center hover:bg-gray-100 transition-colors">
+                    <i class="fab fa-apple mr-2"></i>
+                    Download for iOS
+                </button>
+                <button class="bg-black text-white px-8 py-3 rounded-full font-semibold flex items-center justify-center hover:bg-gray-800 transition-colors">
+                    <i class="fab fa-google-play mr-2"></i>
+                    Download for Android
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- Company Info -->
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-green-primary to-green-secondary rounded-full flex items-center justify-center mr-2">
+                            <i class="fas fa-recycle text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold">Green Coins</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Transforming e-waste into rewards while building a sustainable future.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-green-400 transition-colors">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-green-400 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-green-400 transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="scanner.html" class="hover:text-green-400 transition-colors">AI Scanner</a></li>
+                        <li><a href="rewards.html" class="hover:text-green-400 transition-colors">Rewards</a></li>
+                        <li><a href="kiosks.html" class="hover:text-green-400 transition-colors">Find Kiosks</a></li>
+                        <li><a href="leaderboard.html" class="hover:text-green-400 transition-colors">Leaderboard</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Community -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Community</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="community.html" class="hover:text-green-400 transition-colors">Community Feed</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition-colors">Challenges</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition-colors">Badges</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Support -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-green-400 transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-6 text-center text-gray-400 text-sm">
+                <p>&copy; 2024 Green Coins. All rights reserved. Made with 💚 for a sustainable future.</p>
+            </div>
+        </div>
+    </footer>
+<div id="auth-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center hidden">
+    <div class="bg-white p-8 rounded-xl max-w-md w-full shadow-2xl relative">
+        <button onclick="document.getElementById('auth-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times"></i>
+        </button>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center" id="auth-title">Sign In</h2>
+        
+        <form id="signin-form">
+            <input type="email" id="signin-email" placeholder="Email" required class="w-full mb-3 p-2 border rounded">
+            <input type="password" id="signin-password" placeholder="Password" required class="w-full mb-3 p-2 border rounded">
+            <button type="submit" class="w-full bg-green-primary text-white py-2 rounded mt-4">Sign In</button>
+        </form>
+        <form id="signup-form" class="hidden">
+            <input type="text" id="signup-username" placeholder="Username" required class="w-full mb-3 p-2 border rounded">
+            <input type="email" id="signup-email" placeholder="Email" required class="w-full mb-3 p-2 border rounded">
+            <input type="password" id="signup-password" placeholder="Password" required class="w-full mb-3 p-2 border rounded">
+            <button type="submit" class="w-full bg-green-primary text-white py-2 rounded mt-4">Sign Up</button>
+        </form>
+
+        <p class="text-center mt-4 text-sm">
+            <span id="auth-switch-text">New user? </span>
+            <button id="auth-switch-btn" class="text-green-primary hover:text-green-secondary font-semibold">Create Account</button>
+        </p>
+        <p id="auth-message" class="text-center mt-4 text-sm text-red-500"></p>
+    </div>
+</div>
+                </div>
+            </div>
+        </div>
+    <script src="js/main.js"></script>
+    <script src="js/three-animations.js"></script>
+    <script src="js/charts.js"></script>
+</body>
+</html>
