@@ -52,6 +52,10 @@ class GreenCoinsApp {
                 this.authModal.classList.remove('hidden');
             }
         });
+        document.getElementById("startEarningBtn").addEventListener("click", function() {
+    window.location.href = "./scanner.html"; // Replace with your target URL
+});
+
 
         // 2. Toggle Forms Handler (for the text button inside the modal)
         this.authSwitchBtn.addEventListener('click', this.toggleAuthForms.bind(this));
