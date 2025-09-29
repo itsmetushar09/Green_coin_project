@@ -4,6 +4,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/authMiddleware');
+
 const router = express.Router();
 
 // Helper function to generate JWT
@@ -17,7 +18,8 @@ const generateToken = (id) => {
 // @desc    Register a new user
 router.post('/signup', async (req, res) => {
     const { username, email, password } = req.body;
-    
+    console.log('Signup payload:', req.body);
+
     if (!username || !email || !password) {
         return res.status(400).json({ message: 'Please enter all fields' });
     }
@@ -39,6 +41,7 @@ router.post('/signup', async (req, res) => {
         });
 
     } catch (error) {
+        console.error('Signup error:', error); // <--- Add this line
         res.status(500).json({ message: 'Server error during signup' });
     }
 });

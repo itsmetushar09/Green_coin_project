@@ -4,21 +4,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 
-// Load environment variables, explicitly pointing to the project root
-// The '../' goes up one level from 'backend' to 'Projectt'
-dotenv.config({ path: '../.env' });
- 
+ dotenv.config({ path: path.resolve(__dirname, '../.env') }); 
 
 // Import routes
-const userRoutes = require('../routes/userRoutes');
+const userRoutes = require('./routes/userRoutes'); 
 
 
-// ... (rest of the code) ...
-
-
-
-
+// ... (rest of the code) ...   
 
 
 
@@ -30,6 +24,7 @@ app.use(cors());
 app.use(express.json()); // Body parser for JSON requests
 
 // --- Database Connection ---
+const MONGODB_URI = process.env.MONGODB_URI;
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('MongoDB connected successfully!'))
     .catch(err => console.error('MongoDB connection error:', err));
@@ -37,12 +32,12 @@ mongoose.connect(process.env.MONGODB_URI)
 // --- API Routes ---
 // Base route for user authentication and dynamic data
 app.use('/api/users', userRoutes); 
-
-// Error handling (simple example)
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
+app.use(express.static(path.join(__dirname, '../public/frontend'))); // Correct for assets
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../index.html')); // <--- ERROR 2: Path is wrong
 });
+
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
