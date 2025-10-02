@@ -1,758 +1,605 @@
-// Enhanced Three.js Animations for Scanner Page
-
-class ScannerAnimations {
+class DeviceScanner {
     constructor() {
-        this.scenes = {};
-        this.renderers = {};
-        this.cameras = {};
-        this.animationIds = {};
-        this.scanningActive = false;
-        
+        this.API_BASE_URL = 'http://localhost:5000/api';
+        this.token = localStorage.getItem('greenCoinsToken');
+        this.currentScan = null;
         this.init();
     }
 
     init() {
-        document.addEventListener('DOMContentLoaded', () => {
-            this.createScannerHero();
-            this.createUploadIcon();
-            this.createAIFeatures();
-            this.createWaitingAnimation();
-            this.createParticleBackground();
-            this.setupScannerInteractions();
-        });
+        this.bindEvents();
+        this.checkAuth();
+        this.setupCamera();
     }
 
-    createScannerHero() {
-        const container = document.getElementById('scanner-hero-3d');
-        if (!container) return;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ 
-            antialias: true, 
-            alpha: true 
-        });
-        
-        renderer.setSize(320, 320);
-        renderer.setClearColor(0x000000, 0);
-        container.appendChild(renderer.domElement);
-
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(10, 10, 5);
-        scene.add(directionalLight);
-
-        // Create central scanning device
-        const deviceGroup = new THREE.Group();
-        
-        // Main scanner body
-        const scannerGeometry = new THREE.BoxGeometry(1, 1.5, 0.2);
-        const scannerMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
-        const scanner = new THREE.Mesh(scannerGeometry, scannerMaterial);
-        deviceGroup.add(scanner);
-
-        // Scanner screen
-        const screenGeometry = new THREE.PlaneGeometry(0.8, 1.2);
-        const screenMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0x00AAFF,
-            transparent: true,
-            opacity: 0.8
-        });
-        const screen = new THREE.Mesh(screenGeometry, screenMaterial);
-        screen.position.z = 0.11;
-        deviceGroup.add(screen);
-
-        // Scanning beam
-        const beamGeometry = new THREE.PlaneGeometry(0.9, 0.05);
-        const beamMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0x00FF00,
-            transparent: true,
-            opacity: 0.8
-        });
-        const scanBeam = new THREE.Mesh(beamGeometry, beamMaterial);
-        scanBeam.position.z = 0.12;
-        deviceGroup.add(scanBeam);
-
-        // Create orbiting devices
-        const orbitingDevices = [];
-        const deviceTypes = [
-            { geometry: new THREE.BoxGeometry(0.3, 0.5, 0.05), color: 0x333333 }, // Phone
-            { geometry: new THREE.BoxGeometry(0.6, 0.4, 0.05), color: 0x444444 }, // Laptop
-            { geometry: new THREE.BoxGeometry(0.4, 0.3, 0.03), color: 0x555555 }, // Tablet
-            { geometry: new THREE.CylinderGeometry(0.05, 0.05, 0.3, 8), color: 0x222222 } // Charger
-        ];
-
-        deviceTypes.forEach((deviceType, index) => {
-            const device = new THREE.Mesh(deviceType.geometry, new THREE.MeshLambertMaterial({ color: deviceType.color }));
-            const angle = (index / deviceTypes.length) * Math.PI * 2;
-            device.position.x = Math.cos(angle) * 3;
-            device.position.y = Math.sin(angle) * 2;
-            device.position.z = Math.sin(angle * 2) * 0.5;
-            
-            device.userData = {
-                angle: angle,
-                orbitRadius: 3,
-                rotationSpeed: 0.01 + Math.random() * 0.01
-            };
-            
-            orbitingDevices.push(device);
-            scene.add(device);
-        });
-
-        scene.add(deviceGroup);
-        camera.position.z = 6;
-
-        // Animation loop
-        let scanBeamY = -0.6;
-        let scanDirection = 1;
-
-        const animate = () => {
-            this.animationIds.hero = requestAnimationFrame(animate);
-            
-            const time = Date.now() * 0.001;
-            
-            // Rotate main device group
-            deviceGroup.rotation.y += 0.005;
-            
-            // Animate scanning beam
-            scanBeamY += scanDirection * 0.02;
-            if (scanBeamY > 0.6) scanDirection = -1;
-            if (scanBeamY < -0.6) scanDirection = 1;
-            scanBeam.position.y = scanBeamY;
-            
-            // Animate beam opacity
-            scanBeam.material.opacity = 0.6 + Math.sin(time * 5) * 0.3;
-            
-            // Animate orbiting devices
-            orbitingDevices.forEach((device, index) => {
-                device.userData.angle += 0.01;
-                device.position.x = Math.cos(device.userData.angle) * device.userData.orbitRadius;
-                device.position.y = Math.sin(device.userData.angle) * 2;
-                device.position.z = Math.sin(device.userData.angle * 2) * 0.5;
-                
-                device.rotation.x += device.userData.rotationSpeed;
-                device.rotation.y += device.userData.rotationSpeed * 1.5;
-            });
-            
-            renderer.render(scene, camera);
-        };
-        
-        animate();
-        
-        this.scenes.hero = scene;
-        this.cameras.hero = camera;
-        this.renderers.hero = renderer;
+    checkAuth() {
+        if (!this.token) {
+            this.showAuthRequired();
+            return false;
+        }
+        return true;
     }
 
-    createUploadIcon() {
-        const container = document.getElementById('upload-3d-icon');
-        if (!container) return;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ 
-            antialias: true, 
-            alpha: true 
-        });
-        
-        renderer.setSize(96, 96);
-        renderer.setClearColor(0x000000, 0);
-        container.appendChild(renderer.domElement);
-
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        scene.add(ambientLight);
-
-        // Create upload arrow
-        const arrowGroup = new THREE.Group();
-        
-        // Arrow shaft
-        const shaftGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 8);
-        const shaftMaterial = new THREE.MeshBasicMaterial({ color: 0x3B82F6 });
-        const shaft = new THREE.Mesh(shaftGeometry, shaftMaterial);
-        arrowGroup.add(shaft);
-
-        // Arrow head
-        const headGeometry = new THREE.ConeGeometry(0.3, 0.4, 8);
-        const headMaterial = new THREE.MeshBasicMaterial({ color: 0x3B82F6 });
-        const head = new THREE.Mesh(headGeometry, headMaterial);
-        head.position.y = 0.7;
-        arrowGroup.add(head);
-
-        // Cloud base
-        const cloudGeometry = new THREE.SphereGeometry(0.4, 8, 8);
-        const cloudMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0xE5E7EB,
-            transparent: true,
-            opacity: 0.8
-        });
-        const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
-        cloud.position.y = -0.8;
-        cloud.scale.set(1.5, 0.6, 1);
-        arrowGroup.add(cloud);
-
-        scene.add(arrowGroup);
-        camera.position.z = 3;
-
-        // Animation loop
-        const animate = () => {
-            this.animationIds.upload = requestAnimationFrame(animate);
-            
-            const time = Date.now() * 0.002;
-            
-            // Float animation
-            arrowGroup.position.y = Math.sin(time) * 0.2;
-            arrowGroup.rotation.y += 0.01;
-            
-            // Pulse effect
-            const scale = 1 + Math.sin(time * 2) * 0.1;
-            arrowGroup.scale.setScalar(scale);
-            
-            renderer.render(scene, camera);
-        };
-        
-        animate();
-        
-        this.scenes.upload = scene;
-        this.cameras.upload = camera;
-        this.renderers.upload = renderer;
+    showAuthRequired() {
+        const scanSection = document.getElementById('scanner-section');
+        if (scanSection) {
+            scanSection.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="mb-6">
+                        <i class="fas fa-lock text-6xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Authentication Required</h3>
+                    <p class="text-gray-600 mb-6">Please sign in to use the AI device scanner.</p>
+                    <a href="index.html" class="bg-green-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-green-secondary transition-colors">
+                        Go to Home Page
+                    </a>
+                </div>
+            `;
+        }
     }
 
-    createAIFeatures() {
-        // Create 3D icons for AI features
-        const features = [
-            { id: 'ai-feature-1', icon: 'eye', color: 0x10B981 },
-            { id: 'ai-feature-2', icon: 'brain', color: 0x3B82F6 },
-            { id: 'ai-feature-3', icon: 'calculator', color: 0x8B5CF6 },
-            { id: 'ai-feature-4', icon: 'leaf', color: 0x059669 }
-        ];
-
-        features.forEach(feature => {
-            this.createFeatureIcon(feature.id, feature.icon, feature.color);
-        });
-    }
-
-    createFeatureIcon(containerId, iconType, color) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ 
-            antialias: true, 
-            alpha: true 
-        });
-        
-        renderer.setSize(64, 64);
-        renderer.setClearColor(0x000000, 0);
-        container.appendChild(renderer.domElement);
-
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        scene.add(ambientLight);
-
-        let mainObject;
-
-        switch(iconType) {
-            case 'eye':
-                // Eye shape
-                const eyeGeometry = new THREE.SphereGeometry(0.4, 16, 8);
-                const eyeMaterial = new THREE.MeshBasicMaterial({ color: color });
-                mainObject = new THREE.Mesh(eyeGeometry, eyeMaterial);
-                
-                // Pupil
-                const pupilGeometry = new THREE.SphereGeometry(0.2, 8, 8);
-                const pupilMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-                const pupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
-                pupil.position.z = 0.3;
-                mainObject.add(pupil);
-                break;
-                
-            case 'brain':
-                // Brain-like structure
-                const brainGeometry = new THREE.SphereGeometry(0.4, 8, 8);
-                const brainMaterial = new THREE.MeshBasicMaterial({ color: color });
-                mainObject = new THREE.Mesh(brainGeometry, brainMaterial);
-                mainObject.scale.set(1.2, 1, 0.8);
-                break;
-                
-            case 'calculator':
-                // Calculator/chip
-                const chipGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.1);
-                const chipMaterial = new THREE.MeshBasicMaterial({ color: color });
-                mainObject = new THREE.Mesh(chipGeometry, chipMaterial);
-                break;
-                
-            case 'leaf':
-                // Leaf shape
-                const leafGeometry = new THREE.ConeGeometry(0.3, 0.8, 8);
-                const leafMaterial = new THREE.MeshBasicMaterial({ color: color });
-                mainObject = new THREE.Mesh(leafGeometry, leafMaterial);
-                mainObject.rotation.z = Math.PI / 4;
-                break;
+    bindEvents() {
+        // File upload
+        const fileInput = document.getElementById('device-image-input');
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
         }
 
-        scene.add(mainObject);
-        camera.position.z = 2;
-
-        // Animation loop
-        const animate = () => {
-            this.animationIds[containerId] = requestAnimationFrame(animate);
-            
-            const time = Date.now() * 0.003;
-            
-            mainObject.rotation.y += 0.02;
-            mainObject.position.y = Math.sin(time) * 0.1;
-            
-            renderer.render(scene, camera);
-        };
-        
-        animate();
-        
-        this.scenes[containerId] = scene;
-        this.cameras[containerId] = camera;
-        this.renderers[containerId] = renderer;
-    }
-
-    createWaitingAnimation() {
-        const container = document.getElementById('waiting-3d');
-        if (!container) return;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ 
-            antialias: true, 
-            alpha: true 
-        });
-        
-        renderer.setSize(128, 128);
-        renderer.setClearColor(0x000000, 0);
-        container.appendChild(renderer.domElement);
-
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        scene.add(ambientLight);
-
-        // Create loading dots
-        const dots = [];
-        for (let i = 0; i < 3; i++) {
-            const dotGeometry = new THREE.SphereGeometry(0.1, 8, 8);
-            const dotMaterial = new THREE.MeshBasicMaterial({ color: 0x6B7280 });
-            const dot = new THREE.Mesh(dotGeometry, dotMaterial);
-            dot.position.x = (i - 1) * 0.4;
-            dot.userData = { delay: i * 0.5 };
-            dots.push(dot);
-            scene.add(dot);
+        // Camera capture
+        const captureBtn = document.getElementById('capture-photo');
+        if (captureBtn) {
+            captureBtn.addEventListener('click', () => this.capturePhoto());
         }
 
-        camera.position.z = 2;
-
-        // Animation loop
-        const animate = () => {
-            this.animationIds.waiting = requestAnimationFrame(animate);
-            
-            const time = Date.now() * 0.005;
-            
-            dots.forEach((dot, index) => {
-                dot.position.y = Math.sin(time + dot.userData.delay) * 0.3;
-                dot.material.color.setHSL(0.6, 0.7, 0.5 + Math.sin(time + dot.userData.delay) * 0.3);
-            });
-            
-            renderer.render(scene, camera);
-        };
-        
-        animate();
-        
-        this.scenes.waiting = scene;
-        this.cameras.waiting = camera;
-        this.renderers.waiting = renderer;
-    }
-
-    createParticleBackground() {
-        const container = document.getElementById('scanner-particles');
-        if (!container) return;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000, 0);
-        container.appendChild(renderer.domElement);
-
-        // Create scanning particles
-        const particleCount = 60;
-        const particles = [];
-        
-        for (let i = 0; i < particleCount; i++) {
-            const geometry = new THREE.SphereGeometry(0.02, 4, 4);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: new THREE.Color().setHSL(0.5 + Math.random() * 0.3, 0.7, 0.6),
-                transparent: true,
-                opacity: 0.6
-            });
-            const particle = new THREE.Mesh(geometry, material);
-            
-            particle.position.x = (Math.random() - 0.5) * 20;
-            particle.position.y = (Math.random() - 0.5) * 20;
-            particle.position.z = (Math.random() - 0.5) * 20;
-            
-            particle.userData = {
-                velocity: {
-                    x: (Math.random() - 0.5) * 0.01,
-                    y: (Math.random() - 0.5) * 0.01,
-                    z: (Math.random() - 0.5) * 0.01
-                }
-            };
-            
-            particles.push(particle);
-            scene.add(particle);
+        // Scan button
+        const scanBtn = document.getElementById('scan-device');
+        if (scanBtn) {
+            scanBtn.addEventListener('click', () => this.scanDevice());
         }
 
-        camera.position.z = 5;
+        // Recycle confirm button
+        const recycleBtn = document.getElementById('confirm-recycle');
+        if (recycleBtn) {
+            recycleBtn.addEventListener('click', () => this.confirmRecycle());
+        }
 
-        // Animation loop
-        const animate = () => {
-            this.animationIds.particles = requestAnimationFrame(animate);
-            
-            particles.forEach(particle => {
-                particle.position.add(new THREE.Vector3(
-                    particle.userData.velocity.x,
-                    particle.userData.velocity.y,
-                    particle.userData.velocity.z
-                ));
-                
-                // Wrap around screen
-                if (particle.position.x > 10) particle.position.x = -10;
-                if (particle.position.x < -10) particle.position.x = 10;
-                if (particle.position.y > 10) particle.position.y = -10;
-                if (particle.position.y < -10) particle.position.y = 10;
-                
-                // Pulse effect
-                const scale = 1 + Math.sin(Date.now() * 0.003 + particle.position.x) * 0.5;
-                particle.scale.setScalar(scale);
-            });
-            
-            renderer.render(scene, camera);
-        };
-        
-        animate();
-
-        // Handle resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    }
-
-    setupScannerInteractions() {
-        // Upload area interactions
+        // Upload area drag and drop
         const uploadArea = document.getElementById('upload-area');
-        const fileInput = document.getElementById('device-upload');
-        
-        if (uploadArea && fileInput) {
-            uploadArea.addEventListener('click', () => fileInput.click());
+        if (uploadArea) {
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                uploadArea.style.borderColor = '#3B82F6';
-                uploadArea.style.backgroundColor = '#EFF6FF';
+                uploadArea.classList.add('border-green-primary', 'bg-green-50');
             });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.style.borderColor = '#D1D5DB';
-                uploadArea.style.backgroundColor = 'white';
+
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('border-green-primary', 'bg-green-50');
             });
-            
+
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
+                uploadArea.classList.remove('border-green-primary', 'bg-green-50');
+                
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
-                    this.handleFileUpload(files[0]);
-                }
-                uploadArea.style.borderColor = '#D1D5DB';
-                uploadArea.style.backgroundColor = 'white';
-            });
-            
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files[0]) {
-                    this.handleFileUpload(e.target.files[0]);
+                    this.handleFileSelect(files[0]);
                 }
             });
-        }
 
-        // Quick scan buttons
-        document.querySelectorAll('.quick-scan-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const deviceType = btn.dataset.device;
-                this.simulateQuickScan(deviceType);
-            });
-        });
-
-        // Help button
-        const helpBtn = document.getElementById('help-btn');
-        if (helpBtn) {
-            helpBtn.addEventListener('click', () => {
-                this.showHelpModal();
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
             });
         }
     }
 
-    handleFileUpload(file) {
+    setupCamera() {
+        const video = document.getElementById('camera-feed');
+        const startCameraBtn = document.getElementById('start-camera');
+
+        if (startCameraBtn) {
+            startCameraBtn.addEventListener('click', async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: 'environment' } // Use back camera on mobile
+                    });
+                    
+                    if (video) {
+                        video.srcObject = stream;
+                        video.style.display = 'block';
+                        startCameraBtn.style.display = 'none';
+                        
+                        const captureBtn = document.getElementById('capture-photo');
+                        if (captureBtn) {
+                            captureBtn.style.display = 'block';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error accessing camera:', error);
+                    this.showError('Unable to access camera. Please upload an image instead.');
+                }
+            });
+        }
+    }
+
+    handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            this.handleFileSelect(file);
+        }
+    }
+
+    handleFileSelect(file) {
+        // Validate file type
         if (!file.type.startsWith('image/')) {
-            this.showNotification('❌ Please upload an image file', 'error');
+            this.showError('Please select an image file.');
             return;
         }
-        
+
+        // Validate file size (10MB limit)
         if (file.size > 10 * 1024 * 1024) {
-            this.showNotification('❌ File size must be under 10MB', 'error');
+            this.showError('Image size should be less than 10MB.');
             return;
         }
+
+        // Display preview
+        this.displayImagePreview(file);
         
-        this.startScanning(file);
+        // Store file for scanning
+        this.selectedFile = file;
+        
+        // Enable scan button
+        const scanBtn = document.getElementById('scan-device');
+        if (scanBtn) {
+            scanBtn.disabled = false;
+            scanBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
     }
 
-    simulateQuickScan(deviceType) {
-        const mockFile = new File([''], `${deviceType}.jpg`, { type: 'image/jpeg' });
-        this.startScanning(mockFile);
+    displayImagePreview(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewContainer = document.getElementById('image-preview');
+            if (previewContainer) {
+                previewContainer.innerHTML = `
+                    <div class="relative">
+                        <img src="${e.target.result}" alt="Device preview" class="w-full h-64 object-cover rounded-lg">
+                        <button onclick="this.clearPreview()" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                previewContainer.classList.remove('hidden');
+            }
+        };
+        reader.readAsDataURL(file);
     }
 
-    startScanning(file) {
-        this.scanningActive = true;
+    clearPreview() {
+        const previewContainer = document.getElementById('image-preview');
+        if (previewContainer) {
+            previewContainer.classList.add('hidden');
+            previewContainer.innerHTML = '';
+        }
+
+        this.selectedFile = null;
         
-        // Update UI
-        const uploadArea = document.getElementById('upload-area');
-        const scanningProgress = document.getElementById('scanning-progress');
-        const noResults = document.getElementById('no-results');
+        const scanBtn = document.getElementById('scan-device');
+        if (scanBtn) {
+            scanBtn.disabled = true;
+            scanBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        const fileInput = document.getElementById('device-image-input');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+    }
+
+    capturePhoto() {
+        const video = document.getElementById('camera-feed');
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        if (video) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+
+            // Convert to blob
+            canvas.toBlob((blob) => {
+                const file = new File([blob], 'captured-device.jpg', { type: 'image/jpeg' });
+                this.handleFileSelect(file);
+                
+                // Stop camera
+                const stream = video.srcObject;
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+                video.style.display = 'none';
+                
+                const startCameraBtn = document.getElementById('start-camera');
+                if (startCameraBtn) {
+                    startCameraBtn.style.display = 'block';
+                }
+                
+                const captureBtn = document.getElementById('capture-photo');
+                if (captureBtn) {
+                    captureBtn.style.display = 'none';
+                }
+            }, 'image/jpeg', 0.8);
+        }
+    }
+
+    async scanDevice() {
+        if (!this.checkAuth()) return;
         
-        uploadArea.innerHTML = `
-            <div class="flex items-center justify-center">
-                <div class="animate-spin mr-3">
-                    <i class="fas fa-cog text-blue-500 text-3xl"></i>
+        if (!this.selectedFile) {
+            this.showError('Please select an image first.');
+            return;
+        }
+
+        const scanBtn = document.getElementById('scan-device');
+        const originalText = scanBtn ? scanBtn.textContent : '';
+        
+        try {
+            // Update UI to show scanning
+            if (scanBtn) {
+                scanBtn.disabled = true;
+                scanBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Scanning...';
+            }
+
+            this.showScanningProgress();
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('deviceImage', this.selectedFile);
+
+            // Send to API
+            const response = await fetch(`${this.API_BASE_URL}/devices/scan`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                this.currentScan = data;
+                this.displayScanResults(data);
+            } else {
+                this.showError(data.message || 'Failed to scan device');
+            }
+
+        } catch (error) {
+            console.error('Scan error:', error);
+            this.showError('Failed to scan device. Please try again.');
+        } finally {
+            if (scanBtn) {
+                scanBtn.disabled = false;
+                scanBtn.innerHTML = originalText;
+            }
+        }
+    }
+
+    showScanningProgress() {
+        const resultsContainer = document.getElementById('scan-results');
+        if (resultsContainer) {
+            resultsContainer.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="mb-4">
+                        <i class="fas fa-robot text-4xl text-green-primary animate-pulse"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">AI Analyzing Your Device...</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                        <div class="bg-green-primary h-2 rounded-full animate-pulse" style="width: 60%"></div>
+                    </div>
+                    <p class="text-gray-600">Please wait while we identify and evaluate your device</p>
                 </div>
-                <div>
-                    <p class="text-blue-600 mb-1">Analyzing "${file.name}"</p>
-                    <p class="text-sm text-gray-500">AI processing in progress...</p>
+            `;
+            resultsContainer.classList.remove('hidden');
+        }
+    }
+
+    displayScanResults(data) {
+        const resultsContainer = document.getElementById('scan-results');
+        const { analysis, environmentalImpact } = data;
+
+        if (resultsContainer) {
+            resultsContainer.innerHTML = `
+                <div class="bg-white rounded-xl p-6 shadow-lg">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-${this.getDeviceIcon(analysis.deviceType)} text-2xl text-green-primary"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Device Identified!</h3>
+                        <div class="flex items-center justify-center space-x-2 mb-4">
+                            <span class="text-lg font-semibold text-green-primary">${this.formatDeviceType(analysis.deviceType)}</span>
+                            <span class="text-gray-400">•</span>
+                            <span class="text-lg font-semibold text-blue-primary">${this.formatCondition(analysis.condition)}</span>
+                        </div>
+                        <div class="flex items-center justify-center space-x-1 mb-4">
+                            <span class="text-sm text-gray-600">Confidence:</span>
+                            <div class="flex space-x-1">
+                                ${this.renderConfidenceStars(analysis.confidence)}
+                            </div>
+                            <span class="text-sm font-medium text-gray-800">${Math.round(analysis.confidence * 100)}%</span>
+                        </div>
+                    </div>
+
+                    <!-- Reward Information -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-green-50 rounded-lg p-4 text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <i class="fas fa-coins text-2xl text-green-primary mr-2"></i>
+                                <span class="text-3xl font-bold text-green-primary">${analysis.coinsReward}</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Green Coins Reward</p>
+                        </div>
+                        <div class="bg-blue-50 rounded-lg p-4 text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <i class="fas fa-dollar-sign text-2xl text-blue-primary mr-2"></i>
+                                <span class="text-3xl font-bold text-blue-primary">$${analysis.estimatedValue}</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Estimated Value</p>
+                        </div>
+                    </div>
+
+                    <!-- Environmental Impact -->
+                    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 mb-6">
+                        <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-leaf text-green-primary mr-2"></i>
+                            Environmental Impact
+                        </h4>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <div class="text-lg font-bold text-green-600">${environmentalImpact.co2Saved}kg</div>
+                                <div class="text-xs text-gray-600">CO₂ Saved</div>
+                            </div>
+                            <div>
+                                <div class="text-lg font-bold text-blue-600">${environmentalImpact.energySaved}kWh</div>
+                                <div class="text-xs text-gray-600">Energy Saved</div>
+                            </div>
+                            <div>
+                                <div class="text-lg font-bold text-purple-600">${environmentalImpact.wasteDiverted}kg</div>
+                                <div class="text-xs text-gray-600">Waste Diverted</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button id="confirm-recycle" class="flex-1 bg-gradient-to-r from-green-primary to-green-secondary text-white py-3 px-6 rounded-full font-semibold hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300">
+                            <i class="fas fa-recycle mr-2"></i>
+                            Confirm & Recycle Now
+                        </button>
+                        <button onclick="window.location.href='kiosks.html'" class="flex-1 border-2 border-green-primary text-green-primary py-3 px-6 rounded-full font-semibold hover:bg-green-primary hover:text-white transition-all duration-300">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            Find Nearest Kiosk
+                        </button>
+                    </div>
                 </div>
+            `;
+
+            // Bind confirm recycle button
+            const confirmBtn = document.getElementById('confirm-recycle');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => this.confirmRecycle());
+            }
+        }
+    }
+
+    async confirmRecycle() {
+        if (!this.checkAuth() || !this.currentScan) return;
+
+        const confirmBtn = document.getElementById('confirm-recycle');
+        const originalText = confirmBtn ? confirmBtn.innerHTML : '';
+
+        try {
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            }
+
+            const { analysis } = this.currentScan;
+            
+            const response = await fetch(`${this.API_BASE_URL}/devices/recycle`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    deviceType: analysis.deviceType,
+                    condition: analysis.condition,
+                    estimatedValue: analysis.estimatedValue,
+                    coinsReward: analysis.coinsReward,
+                    location: 'User Scanner' // You can add location selection later
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                this.showRecycleSuccess(data);
+                this.updateUserStats(data.user);
+            } else {
+                this.showError(data.message || 'Failed to confirm recycling');
+            }
+
+        } catch (error) {
+            console.error('Recycle error:', error);
+            this.showError('Failed to confirm recycling. Please try again.');
+        } finally {
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = originalText;
+            }
+        }
+    }
+
+    showRecycleSuccess(data) {
+        const resultsContainer = document.getElementById('scan-results');
+        const { transaction, user, environmentalImpact } = data;
+
+        if (resultsContainer) {
+            resultsContainer.innerHTML = `
+                <div class="bg-white rounded-xl p-6 shadow-lg text-center">
+                    <div class="mb-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                            <i class="fas fa-check text-3xl text-green-primary"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">🎉 Success!</h3>
+                        <p class="text-green-600 font-semibold text-lg">You earned ${transaction.coinsEarned} Green Coins!</p>
+                    </div>
+
+                    <!-- Updated Stats -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-green-50 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-green-primary">${user.coins}</div>
+                            <div class="text-xs text-gray-600">Total Coins</div>
+                        </div>
+                        <div class="bg-blue-50 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-blue-primary">${user.level}</div>
+                            <div class="text-xs text-gray-600">Level</div>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-purple-primary">${user.devicesRecycled}</div>
+                            <div class="text-xs text-gray-600">Devices</div>
+                        </div>
+                        <div class="bg-orange-50 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-orange-500">${user.badges.length}</div>
+                            <div class="text-xs text-gray-600">Badges</div>
+                        </div>
+                    </div>
+
+                    <!-- Environmental Impact -->
+                    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 mb-6">
+                        <h4 class="font-bold text-gray-800 mb-3">🌱 Your Environmental Contribution</h4>
+                        <div class="grid grid-cols-3 gap-4 text-center text-sm">
+                            <div>
+                                <div class="font-bold text-green-600">${environmentalImpact.co2Saved}kg CO₂</div>
+                                <div class="text-gray-600">Prevented</div>
+                            </div>
+                            <div>
+                                <div class="font-bold text-blue-600">${environmentalImpact.energySaved}kWh</div>
+                                <div class="text-gray-600">Energy Saved</div>
+                            </div>
+                            <div>
+                                <div class="font-bold text-purple-600">${environmentalImpact.wasteDiverted}kg</div>
+                                <div class="text-gray-600">Waste Diverted</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="window.location.reload()" class="flex-1 bg-gradient-to-r from-green-primary to-green-secondary text-white py-3 px-6 rounded-full font-semibold">
+                            <i class="fas fa-camera mr-2"></i>
+                            Scan Another Device
+                        </button>
+                        <button onclick="window.location.href='rewards.html'" class="flex-1 border-2 border-green-primary text-green-primary py-3 px-6 rounded-full font-semibold hover:bg-green-primary hover:text-white transition-all duration-300">
+                            <i class="fas fa-gift mr-2"></i>
+                            View Rewards
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show celebration animation
+        this.showCelebration();
+    }
+
+    showCelebration() {
+        // Create confetti or celebration effect
+        const celebration = document.createElement('div');
+        celebration.className = 'fixed inset-0 pointer-events-none z-50';
+        celebration.innerHTML = `
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-6xl animate-bounce">🎉</div>
             </div>
         `;
-        
-        scanningProgress.classList.remove('hidden');
-        noResults.classList.add('hidden');
-        
-        // Simulate scanning progress
-        this.animateScanningProgress();
-        
-        // Complete scan after delay
+        document.body.appendChild(celebration);
+
         setTimeout(() => {
-            this.completeScan(file);
+            document.body.removeChild(celebration);
         }, 3000);
     }
 
-    animateScanningProgress() {
-        const progressBar = document.querySelector('.progress-bar');
-        const scanStatus = document.getElementById('scan-status');
-        
-        const steps = [
-            { progress: 20, status: 'Loading AI models...' },
-            { progress: 40, status: 'Analyzing image composition...' },
-            { progress: 60, status: 'Identifying device type...' },
-            { progress: 80, status: 'Evaluating condition...' },
-            { progress: 95, status: 'Calculating value...' },
-            { progress: 100, status: 'Analysis complete!' }
-        ];
-        
-        let currentStep = 0;
-        
-        const updateProgress = () => {
-            if (currentStep < steps.length && this.scanningActive) {
-                const step = steps[currentStep];
-                progressBar.style.width = step.progress + '%';
-                scanStatus.textContent = step.status;
-                currentStep++;
-                
-                setTimeout(updateProgress, 500);
-            }
-        };
-        
-        updateProgress();
+    updateUserStats(user) {
+        // Update navigation coins
+        const navCoins = document.getElementById('nav-coins');
+        if (navCoins) {
+            navCoins.textContent = user.coins;
+        }
     }
 
-    completeScan(file) {
-        this.scanningActive = false;
-        
-        // Generate mock analysis results
-        const analysisResult = this.generateAnalysisResult(file.name);
-        
-        // Update UI with results
-        document.getElementById('scanning-progress').classList.add('hidden');
-        document.getElementById('analysis-results').classList.remove('hidden');
-        
-        // Populate results
-        document.getElementById('device-name').textContent = analysisResult.name;
-        document.getElementById('device-condition').textContent = analysisResult.condition;
-        document.getElementById('device-coins').textContent = analysisResult.coins;
-        document.getElementById('device-brand').textContent = analysisResult.brand;
-        document.getElementById('device-category').textContent = analysisResult.category;
-        document.getElementById('co2-impact').textContent = analysisResult.co2 + ' kg saved';
-        document.getElementById('ai-confidence').textContent = analysisResult.confidence + '%';
-        document.getElementById('carbon-reduced').textContent = analysisResult.co2 + ' kg CO₂';
-        document.getElementById('materials-recovered').textContent = analysisResult.materials + '%';
-        document.getElementById('energy-saved').textContent = analysisResult.energy + ' kWh';
-        
-        // Reset upload area
-        setTimeout(() => {
-            document.getElementById('upload-area').innerHTML = `
-                <div id="upload-content">
-                    <div id="upload-3d-icon" class="w-24 h-24 mx-auto mb-4"></div>
-                    <p class="text-gray-600 mb-2 text-lg">Click to upload another device photo</p>
-                    <p class="text-sm text-gray-500">Supports JPG, PNG up to 10MB</p>
-                </div>
-            `;
-            this.createUploadIcon(); // Recreate upload icon
-        }, 1000);
-        
-        this.showNotification('✅ Device analyzed successfully!', 'success');
+    // Helper methods
+    getDeviceIcon(deviceType) {
+        const icons = {
+            smartphone: 'mobile-alt',
+            laptop: 'laptop',
+            tablet: 'tablet-alt',
+            charger: 'plug',
+            headphones: 'headphones',
+            earphones: 'headphones',
+            smartwatch: 'clock',
+            camera: 'camera',
+            mouse: 'mouse',
+            keyboard: 'keyboard',
+            router: 'wifi',
+            speaker: 'volume-up'
+        };
+        return icons[deviceType] || 'microchip';
     }
 
-    generateAnalysisResult(filename) {
-        const deviceDatabase = {
-            'phone': { name: 'Smartphone', brand: 'Generic', category: 'Mobile Device', coins: 150, co2: 0.8, confidence: 92, materials: 85, energy: 2.1 },
-            'iphone': { name: 'iPhone 13 Pro', brand: 'Apple', category: 'Smartphone', coins: 200, co2: 0.9, confidence: 98, materials: 87, energy: 2.4 },
-            'samsung': { name: 'Galaxy S21', brand: 'Samsung', category: 'Smartphone', coins: 180, co2: 0.85, confidence: 95, materials: 86, energy: 2.2 },
-            'laptop': { name: 'Laptop Computer', brand: 'Generic', category: 'Computer', coins: 300, co2: 2.1, confidence: 89, materials: 78, energy: 5.2 },
-            'macbook': { name: 'MacBook Pro', brand: 'Apple', category: 'Laptop', coins: 400, co2: 2.5, confidence: 96, materials: 82, energy: 6.1 },
-            'tablet': { name: 'Tablet Device', brand: 'Generic', category: 'Tablet', coins: 180, co2: 1.2, confidence: 91, materials: 80, energy: 3.1 },
-            'ipad': { name: 'iPad Pro', brand: 'Apple', category: 'Tablet', coins: 220, co2: 1.4, confidence: 97, materials: 83, energy: 3.5 },
-            'charger': { name: 'Phone Charger', brand: 'Generic', category: 'Accessory', coins: 50, co2: 0.3, confidence: 87, materials: 70, energy: 0.8 }
+    formatDeviceType(type) {
+        return type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1');
+    }
+
+    formatCondition(condition) {
+        const conditions = {
+            excellent: 'Excellent',
+            good: 'Good',
+            fair: 'Fair',
+            poor: 'Poor'
         };
+        return conditions[condition] || condition;
+    }
+
+    renderConfidenceStars(confidence) {
+        const stars = 5;
+        const filled = Math.round(confidence * stars);
+        let html = '';
         
-        const lowerName = filename.toLowerCase();
-        for (const [key, value] of Object.entries(deviceDatabase)) {
-            if (lowerName.includes(key)) {
-                return {
-                    ...value,
-                    condition: 'Good Condition'
-                };
+        for (let i = 0; i < stars; i++) {
+            if (i < filled) {
+                html += '<i class="fas fa-star text-yellow-400"></i>';
+            } else {
+                html += '<i class="far fa-star text-gray-300"></i>';
             }
         }
         
-        // Default result
-        return {
-            name: 'Electronic Device',
-            brand: 'Unknown',
-            category: 'Electronics',
-            coins: 100,
-            co2: 0.5,
-            confidence: 85,
-            materials: 75,
-            energy: 1.5,
-            condition: 'Fair Condition'
-        };
+        return html;
     }
 
-    showHelpModal() {
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-white rounded-2xl p-8 max-w-lg mx-4 max-h-96 overflow-y-auto">
-                <h3 class="text-2xl font-bold mb-6 flex items-center">
-                    <i class="fas fa-question-circle text-blue-500 mr-3"></i>
-                    How to Use AI Scanner
-                </h3>
-                
-                <div class="space-y-4 text-sm text-gray-600">
-                    <div>
-                        <h4 class="font-semibold text-gray-800 mb-2">📱 Supported Devices</h4>
-                        <p>Smartphones, tablets, laptops, chargers, headphones, smartwatches, and other electronic devices.</p>
-                    </div>
-                    
-                    <div>
-                        <h4 class="font-semibold text-gray-800 mb-2">📸 Photo Guidelines</h4>
-                        <ul class="list-disc list-inside space-y-1">
-                            <li>Take clear, well-lit photos</li>
-                            <li>Include the entire device in frame</li>
-                            <li>Avoid shadows and glare</li>
-                            <li>Multiple angles help accuracy</li>
-                        </ul>
-                    </div>
-                    
-                    <div>
-                        <h4 class="font-semibold text-gray-800 mb-2">🤖 AI Analysis</h4>
-                        <p>Our AI identifies device type, assesses condition, and calculates fair market value in Green Coins.</p>
-                    </div>
-                    
-                    <div>
-                        <h4 class="font-semibold text-gray-800 mb-2">💰 Coin Values</h4>
-                        <p>Values are based on device type, condition, age, and current market rates. Premium devices earn more coins.</p>
-                    </div>
-                </div>
-                
-                <button class="w-full mt-6 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors" onclick="this.closest('.fixed').remove()">
-                    Got It!
-                </button>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.remove();
-            }
-        });
-    }
-
-    showNotification(message, type = 'info') {
-        if (window.greenCoinsApp && window.greenCoinsApp.showNotification) {
-            window.greenCoinsApp.showNotification(message, type);
-        } else {
-            // Fallback notification
-            const notification = document.createElement('div');
-            notification.className = `fixed top-20 right-4 p-4 rounded-lg shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-500 text-white' : 
-                type === 'error' ? 'bg-red-500 text-white' : 
-                'bg-blue-500 text-white'
-            }`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
+    showError(message) {
+        const errorContainer = document.getElementById('error-message');
+        if (errorContainer) {
+            errorContainer.textContent = message;
+            errorContainer.classList.remove('hidden');
             
             setTimeout(() => {
-                notification.remove();
-            }, 3000);
+                errorContainer.classList.add('hidden');
+            }, 5000);
+        } else {
+            alert(message);
         }
-    }
-
-    // Cleanup function
-    destroy() {
-        this.scanningActive = false;
-        
-        Object.values(this.animationIds).forEach(id => {
-            if (id) cancelAnimationFrame(id);
-        });
-        
-        Object.values(this.renderers).forEach(renderer => {
-            if (renderer) renderer.dispose();
-        });
-        
-        this.scenes = {};
-        this.renderers = {};
-        this.cameras = {};
-        this.animationIds = {};
     }
 }
 
-// Initialize scanner animations
-const scannerAnimations = new ScannerAnimations();
-
-// Make globally accessible
-window.scannerAnimations = scannerAnimations;
-
-// Cleanup on page unload
-window.addEventListener('beforeunload', () => {
-    scannerAnimations.destroy();
+// Initialize scanner when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.deviceScanner = new DeviceScanner();
 });
